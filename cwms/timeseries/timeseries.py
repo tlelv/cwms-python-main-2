@@ -3,12 +3,15 @@ from typing import Optional
 
 import pandas as pd
 
+# CHECK IF ACCESSES FOLDER
+import cwms.catalog.catalog as ct
+import cwms.catalog as ct2
 import cwms.api as api
 from cwms.types import JSON, Data
 
 
 def get_timeseries_group(group_id: str, category_id: str, office_id: str) -> Data:
-    """Retreives time series stored in the requested time series group as a dictionary
+    """Retrieves time series stored in the requested time series group as a dictionary
 
     Parameters
         ----------
