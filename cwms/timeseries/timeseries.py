@@ -3,9 +3,7 @@ from typing import Optional
 
 import pandas as pd
 
-# CHECK IF ACCESSES FOLDER
 import cwms.catalog.catalog as ct
-import cwms.catalog as ct2
 import cwms.api as api
 from cwms.types import JSON, Data
 
@@ -35,15 +33,38 @@ def get_timeseries_group(group_id: str, category_id: str, office_id: str) -> Dat
     return Data(response, selector="assigned-time-series")
 
 
+# CREATE FUNCTION THAT SHORTENS PARAMETERS HERE, THEN SENDS TO CATALOG BY CALLING IT
+'''
+def get_timeseries_catalog(
+
+
+)
+
+    params = {"page": page,
+              "page-size": page_size,
+              "units": unit_system,
+              "office": office_id,
+              "like": like,
+              "timeseries-category": timeseries_category_id,
+              "timeseries-group": timeseries_group_id,
+              "location-category": location_category_id,
+              "location-group": location_group_id,
+              "bounding-office": bounding_office_id,
+    }
+    catalog = ct.get_catalog(),
+ ) -> None
+'''
+
+
 def get_timeseries(
-    tsId: str,
-    office_id: str,
-    unit: str = "EN",
-    datum: Optional[str] = None,
-    begin: Optional[datetime] = None,
-    end: Optional[datetime] = None,
-    page_size: int = 500000,
-    version_date: Optional[datetime] = None,
+        tsId: str,
+        office_id: str,
+        unit: str = "EN",
+        datum: Optional[str] = None,
+        begin: Optional[datetime] = None,
+        end: Optional[datetime] = None,
+        page_size: int = 500000,
+        version_date: Optional[datetime] = None,
 ) -> Data:
     """Retrieves time series data from a specified time series and time window.  Value date-times
     obtained are always in UTC.
@@ -104,11 +125,11 @@ def get_timeseries(
 
 
 def timeseries_df_to_json(
-    data: pd.DataFrame,
-    tsId: str,
-    units: str,
-    office_id: str,
-    version_date: Optional[datetime] = None,
+        data: pd.DataFrame,
+        tsId: str,
+        units: str,
+        office_id: str,
+        version_date: Optional[datetime] = None,
 ) -> JSON:
     """This function converts a dataframe to a json dictionary in the correct format to be posted using the store_timeseries fucntion.
 
@@ -169,10 +190,10 @@ def timeseries_df_to_json(
 
 
 def store_timeseries(
-    data: JSON,
-    create_as_ltrs: Optional[bool] = False,
-    store_rule: Optional[str] = None,
-    override_protection: Optional[bool] = False,
+        data: JSON,
+        create_as_ltrs: Optional[bool] = False,
+        store_rule: Optional[str] = None,
+        override_protection: Optional[bool] = False,
 ) -> None:
     """Will Create new TimeSeries if not already present.  Will store any data provided
 

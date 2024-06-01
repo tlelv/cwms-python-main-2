@@ -22,15 +22,12 @@ def init_session():
     cwms.api.init_session(api_root=_MOCK_ROOT)
 
 
-def test_get_timeseries_unversioned_default(requests_mock):
+def test_get_catalog_unversioned_default(requests_mock):
     requests_mock.get(
         f"{_MOCK_ROOT}"
-        "/timeseries?office=SWT&"
-        "name=TEST.Text.Inst.1Hour.0.MockTest&"
-        "unit=EN&"
-        "begin=2008-05-01T15%3A00%3A00%2B00%3A00&"
-        "end=2008-05-01T17%3A00%3A00%2B00%3A00&"
-        "page-size=500000",
+        "page-size=500&"
+        "unit-system=SI&"
+        "like=cat145057&",
         json=_UNVERS_TS_JSON,
     )
 
@@ -42,7 +39,8 @@ def test_get_timeseries_unversioned_default(requests_mock):
     begin = timezone.localize(datetime(2008, 5, 1, 15, 0, 0))
     end = timezone.localize(datetime(2008, 5, 1, 17, 0, 0))
 
-    data = timeseries.get_timeseries(
+#FIX
+    data = timeseries.get_timeseries_catalog(
         tsId=timeseries_id, office_id=office_id, begin=begin, end=end
     )
     assert data.json == _UNVERS_TS_JSON
