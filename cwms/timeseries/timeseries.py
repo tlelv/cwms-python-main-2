@@ -3,7 +3,7 @@ from typing import Optional
 
 import pandas as pd
 
-import cwms.catalog.catalog as ct
+# import cwms.catalog.catalog as ct
 import cwms.api as api
 from cwms.types import JSON, Data
 
@@ -31,29 +31,6 @@ def get_timeseries_group(group_id: str, category_id: str, office_id: str) -> Dat
 
     response = api.get(endpoint=endpoint, params=params, api_version=1)
     return Data(response, selector="assigned-time-series")
-
-
-# CREATE FUNCTION THAT SHORTENS PARAMETERS HERE, THEN SENDS TO CATALOG BY CALLING IT
-'''
-def get_timeseries_catalog(
-
-
-)
-
-    params = {"page": page,
-              "page-size": page_size,
-              "units": unit_system,
-              "office": office_id,
-              "like": like,
-              "timeseries-category": timeseries_category_id,
-              "timeseries-group": timeseries_group_id,
-              "location-category": location_category_id,
-              "location-group": location_group_id,
-              "bounding-office": bounding_office_id,
-    }
-    catalog = ct.get_catalog(),
- ) -> None
-'''
 
 
 def get_timeseries(
@@ -131,7 +108,7 @@ def timeseries_df_to_json(
         office_id: str,
         version_date: Optional[datetime] = None,
 ) -> JSON:
-    """This function converts a dataframe to a json dictionary in the correct format to be posted using the store_timeseries fucntion.
+    """This function converts a dataframe to a json dictionary in the correct format to be posted using the store_timeseries function.
 
     Parameters
     ----------

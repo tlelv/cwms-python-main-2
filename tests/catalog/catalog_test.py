@@ -3,6 +3,8 @@
 #  All Rights Reserved.  USACE PROPRIETARY/CONFIDENTIAL.
 #  Source may not be released without written approval from HEC
 
+#UNFINISHED
+
 from datetime import datetime
 
 import pytest
@@ -13,8 +15,8 @@ import cwms.timeseries.timeseries as timeseries
 from tests._test_utils import read_resource_file
 
 _MOCK_ROOT = "https://mockwebserver.cwms.gov"
-_VERS_TS_JSON = read_resource_file("versioned_num_ts.json")
-_UNVERS_TS_JSON = read_resource_file("unversioned_num_ts.json")
+_VERS_TS_JSON = read_resource_file("versioned_num_ts.json")          #UNDERSTANDING THIS
+_UNVERS_TS_JSON = read_resource_file("unversioned_num_ts.json")      #UNDERSTANDING THIS
 
 
 @pytest.fixture(autouse=True)
@@ -26,18 +28,12 @@ def test_get_catalog_unversioned_default(requests_mock):
     requests_mock.get(
         f"{_MOCK_ROOT}"
         "page-size=500&"
-        "unit-system=SI&"
-        "like=cat145057&",
+        "unit-system=SI&",
         json=_UNVERS_TS_JSON,
     )
 
     timeseries_id = "TEST.Text.Inst.1Hour.0.MockTest"
     office_id = "SWT"
-
-    # explicitly format begin and end dates with default timezone as an example
-    timezone = pytz.timezone("UTC")
-    begin = timezone.localize(datetime(2008, 5, 1, 15, 0, 0))
-    end = timezone.localize(datetime(2008, 5, 1, 17, 0, 0))
 
 #FIX
     data = timeseries.get_timeseries_catalog(
