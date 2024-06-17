@@ -2,101 +2,123 @@
 #  United States Army Corps of Engineers - Hydrologic Engineering Center (USACE/HEC)
 #  All Rights Reserved.  USACE PROPRIETARY/CONFIDENTIAL.
 #  Source may not be released without written approval from HEC
-
-#UNFINISHED
-
+import json
 from datetime import datetime
 
 import pytest
 import pytz
 
 import cwms.api
-import cwms.timeseries.timeseries as timeseries
 from tests._test_utils import read_resource_file
+import cwms.catalog.catalog as ct
 
 _MOCK_ROOT = "https://mockwebserver.cwms.gov"
-_VERS_TS_JSON = read_resource_file("versioned_num_ts.json")          #UNDERSTANDING THIS
-_UNVERS_TS_JSON = read_resource_file("unversioned_num_ts.json")      #UNDERSTANDING THIS
+_CATALOG_JSON = read_resource_file("catalog.json")
 
 
 @pytest.fixture(autouse=True)
 def init_session():
     cwms.api.init_session(api_root=_MOCK_ROOT)
 
-
-def test_get_catalog_unversioned_default(requests_mock):
+def test_get_catalog(requests_mock):
     requests_mock.get(
+
+        #JUST FIX THIS MOCK ROOT
         f"{_MOCK_ROOT}"
-        "page-size=500&"
-        "unit-system=SI&",
-        json=_UNVERS_TS_JSON,
+        "/timeseries/binary?office=SPK&name=TEST.Binary.Inst.1Hour.0.MockTest&"
+        "begin=2024-02-12T00%3A00%3A00-08%3A00&"
+        "end=2020-02-12T02%3A00%3A00-08%3A00",
+        json=_CATALOG_JSON,
     )
 
-    timeseries_id = "TEST.Text.Inst.1Hour.0.MockTest"
-    office_id = "SWT"
+    dataset = "TIMESERIES"
+    office_id = "SPK"
+    page = None
+    page_size = 500
+    unit_system = "SI"
+    like = None
+    timeseries_category_like = None
+    timeseries_group_like = None
+    location_category_like = None
+    location_group_like = None
+    bounding_office_like = None
 
-#FIX
-    data = timeseries.get_timeseries_catalog(
-        tsId=timeseries_id, office_id=office_id, begin=begin, end=end
+    data = ct.get_timeseries_catalog(dataset,
+                                     office_id,
+                                     page,
+                                     page_size,
+                                     unit_system,
+                                     like,
+                                     timeseries_category_like,
+                                     timeseries_group_like,
+                                     location_category_like,
+                                     location_group_like,
+                                     bounding_office_like)
+    assert data.json == _CATALOG_JSON
+
+def run_catalog_examples():
+    print("------Running through catalog examples-------")
+
+    # GIVEN DATA for DATASET
+    location = """
+        {
+          "name": "TEST",
+          "latitude": 0,
+          "longitude": 0,
+          "active": true,
+          "public-name": "CWMS TESTING",
+          "long-name": "CWMS TESTING",
+          "description": "CWMS TESTING",
+          "timezone-name": "America/Los_Angeles",
+          "location-kind": "PROJECT",
+          "nation": "US",
+          "state-initial": "NV",
+          "county-name": "Clark",
+          "nearest-city": "Las Vegas, NV",
+          "horizontal-datum": "NAD83",
+          "vertical-datum": "NGVD29",
+          "elevation": 320.04,
+          "bounding-office-id": "SPK",
+          "office-id": "SPK"
+        }
+        """
+    headers = {"Content-Type": constants.HEADER_JSON_V1}
+    print("Storing location TEST")
+    ct_api.get_session().post(
+        "locations", params=None, headers=headers, data=location
     )
-    assert data.json == _UNVERS_TS_JSON
-
-
-def test_create_timeseries_unversioned_default(requests_mock):
-    requests_mock.post(
-        f"{_MOCK_ROOT}/timeseries?"
-        f"create-as-lrts=False&"
-        f"override-protection=False"
+    catalog_dict = json.loads(
+        """
+        {
+              "dataset": location,
+              "page": "",
+              "page-size": "500",
+              "units": "SI",
+              "office": "SPK",
+              "like": "",
+              "timeseries-category": "",
+              "timeseries-group": "",
+              "location-category": "",
+              "location-group": "",
+              "bounding-office": "",
+        }
+        """
     )
+    print(f"Storing catalog params {catalog_dict['dataset']}")
+    ct.get_timeseries_catalog(catalog_dict, office_id=None)
+    date_string = "1900-01-01T06:00:00"
+    office_id = "SPK"
+    effective_date = datetime.strptime(date_string, "%Y-%m-%dT%H:%M:%S")
+    print('dataset')
 
-    data = _UNVERS_TS_JSON
-    timeseries.store_timeseries(data=data)
+    # TEST EACH FUNCTION (INSERT PARAMETER CHECKS)
 
-    assert requests_mock.called
-    assert requests_mock.call_count == 1
-
-
-def test_get_timeseries_versioned_default(requests_mock):
-    requests_mock.get(
-        f"{_MOCK_ROOT}"
-        "/timeseries?office=SWT&"
-        "name=TEST.Text.Inst.1Hour.0.MockTest&"
-        "unit=EN&"
-        "begin=2008-05-01T15%3A00%3A00%2B00%3A00&"
-        "end=2008-05-01T17%3A00%3A00%2B00%3A00&"
-        "page-size=500000&"
-        "version-date=2021-06-20T08%3A00%3A00%2B00%3A00",
-        json=_VERS_TS_JSON,
-    )
-
-    timeseries_id = "TEST.Text.Inst.1Hour.0.MockTest"
-    office_id = "SWT"
-
-    # explicitly format begin and end dates with default timezone as an example
-    timezone = pytz.timezone("UTC")
-    begin = timezone.localize(datetime(2008, 5, 1, 15, 0, 0))
-    end = timezone.localize(datetime(2008, 5, 1, 17, 0, 0))
-    version_date = timezone.localize(datetime(2021, 6, 20, 8, 0, 0))
-
-    data = timeseries.get_timeseries(
-        tsId=timeseries_id,
-        office_id=office_id,
-        begin=begin,
-        end=end,
-        version_date=version_date,
-    )
-    assert data.json == _VERS_TS_JSON
+    # time_series = level_api.retrieve_level_as_timeseries_json(
+    #    level_id, office_id, "m", interval="1Hour"
+    #)
+    #print(time_series)
 
 
-def test_create_timeseries_versioned_default(requests_mock):
-    requests_mock.post(
-        f"{_MOCK_ROOT}/timeseries?"
-        f"create-as-lrts=False&"
-        f"override-protection=False"
-    )
-
-    data = _VERS_TS_JSON
-    timeseries.store_timeseries(data=data)
-
-    assert requests_mock.called
-    assert requests_mock.call_count == 1
+if __name__ == "__main__":
+    ct.function_test()
+    run_catalog_examples()

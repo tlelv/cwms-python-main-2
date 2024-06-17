@@ -3,9 +3,36 @@ from typing import Optional
 
 import pandas as pd
 
-# import cwms.catalog.catalog as ct
+import cwms.catalog.catalog as ct
 import cwms.api as api
 from cwms.types import JSON, Data
+
+
+def get_timeseries_catalog(page: Optional[str] = None,
+                           page_size: Optional[int] = None,
+                           unit_system: Optional[str] = None,
+                           office: Optional[str] = None,
+                           like: Optional[str] = None,
+                           timeseries_category_like: Optional[str] = None,
+                           timeseries_group_like: Optional[str] = None,
+                           location_category_like: Optional[str] = None,
+                           location_group_like: Optional[str] = None,
+                           bounding_office_like: Optional[str] = None,
+                           ) -> Data:
+
+    params = {
+        "page": page,
+        "page-size": page_size,
+        "unit-system": unit_system,
+        "office": office,
+        "like": like,
+        "timeseries-category-like": timeseries_category_like,
+        "timeseries-group-like": timeseries_group_like,
+        "location-category-like": location_category_like,
+        "location-group-like": location_group_like,
+        "bounding-office-like": bounding_office_like
+    }
+    return ct.get_catalog("TIMESERIES", params)
 
 
 def get_timeseries_group(group_id: str, category_id: str, office_id: str) -> Data:

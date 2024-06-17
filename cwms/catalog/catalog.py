@@ -1,31 +1,105 @@
 from typing import Optional, Dict
 
 import cwms.api as api
-from cwms.types import JSON, Data
+from cwms.types import Data
 
 
 # TODO
-#       How to connect to api and test. (Let computer run cwms imports)
-#       Create checks for parameters (to see what is necessary)
-#       GET RESPONSE FROM SERVER TO SEE HOW IT PARSES
-#       UPDATE FORMAT OF DATAFRAME
+#       1. Run CWMS
+#           - Potentially get data/response from server
+#       Extra:
+#           - See format of resulting dataframe or json
+#           - Setup Pre-commit/pre-commit hooks (in docs/read-me)
+#           - Setup pycharm to pre-format before
+#               - black (plugin) and isort on save
+#               - Flake8 (linter)
 
-def get_catalog_filters(
+def function_test():
+    print("Hello World")
+
+
+def get_catalog(dataset: str, params: Dict[str, Optional[str]]) -> Data:
+    """Retrieves filters for the catalog
+
+        Parameters
+            ----------
+            dataset: string
+                The type of data in the list. Valid values for this field
+                are:
+                    1. TIMESERIES
+                    2. LOCATIONS
+            params: dict
+                A dictionary containing the following keys:
+                    dataset: string
+                        The type of data in the list. Valid values for this field
+                        are:
+                            1. TIMESERIES
+                            2. LOCATIONS
+                    page: string
+                        The endpoint used to identify where the request is located.
+                    page_size: integer
+                        The entries per page returned. The default value is 500.
+                    unit_system: string
+                        The unit system desired in response. Valid values for this
+                        field are:
+                            1. SI
+                            2. EN
+                    office: string
+                        The owning office of the timeseries group.
+                    like: string
+                        The regex for matching against the id
+                    timeseries_category_like: string
+                        The regex for matching against the category id
+                    timeseries_group_like: string
+                        The regex for matching against the timeseries group id
+                    location_category_like: string
+                        The regex for matching against the location category id
+                    location_group_like: string
+                        The regex for matching against the location group id
+                    bounding_office_like: string
+                        The regex for matching against the location bounding office
+
+            Returns
+            -------
+            response : dict
+                The JSON response containing the time series catalog.
+        """
+
+    # CHECKS
+    if dataset is None:
+        raise ValueError("Cannot retrieve a time series for a catalog without a dataset")
+
+    endpoint = f"catalog/{dataset}"
+
+    # creates the dataframe from the timeseries data
+    response = api.get(endpoint=endpoint, params=params, api_version=1)
+    return Data(response, selector="time-series-catalog")
+
+
+'''
+
+def get_catalog(
+        dataset: str,
+        office_id: str,
         page: Optional[str] = None,
         page_size: Optional[int] = None,
         unit_system: Optional[str] = None,
-        office_id: Optional[str] = None,
         like: Optional[str] = None,
         timeseries_category_like: Optional[str] = None,
         timeseries_group_like: Optional[str] = None,
         location_category_like: Optional[str] = None,
         location_group_like: Optional[str] = None,
         bounding_office_like: Optional[str] = None,
-) -> dict[str, str | None | int]:
-    """Retrieves filters for the time series catalog
+) -> Data:
+    """Retrieves filters for the catalog
 
         Parameters
         ----------
+            dataset: string
+                The type of data in the list. Valid values for this field
+                are:
+                    1. TIMESERIES
+                    2. LOCATIONS
             page: string
                 The endpoint used to identify where the request is located.
             page_size: integer
@@ -53,8 +127,16 @@ def get_catalog_filters(
         Returns
         -------
         response : dict
-            The filter response containing the time series catalog arguments.
+            The JSON response containing the time series catalog.
         """
+    
+    # CHECKS
+    if dataset is None:
+        raise ValueError("Cannot retrieve a time series for a catalog without a dataset")
+    if office_id is None:
+        raise ValueError("Retrieve timeseries catalog requires an office")
+    
+    endpoint = f"catalog/{dataset}"
     params = {"page": page,
               "page-size": page_size,
               "units": unit_system,
@@ -66,27 +148,8 @@ def get_catalog_filters(
               "location-group": location_group_like,
               "bounding-office": bounding_office_like,
               }
-    return params
-
-
-#   Put function that receives a dictionary of data and puts it into the args)
-def get_catalog(dataset: str) -> Data:
-    """Retrieves time series catalog
-
-    Parameters
-    ----------
-        dataset: string
-            The type of data in the list. Valid values for this field
-            are:
-                1. TIMESERIES
-                2. LOCATIONS
-    Returns
-    -------
-    response : dict
-        The JSON response containing the time series catalog information.
-    """
-
-    # creates the dataframe from the timeseries data
-    endpoint = f"catalog/{dataset}"
-    response = api.get(endpoint=endpoint, params=get_catalog_filters(), api_version=1)
+    
+    # creates the dataframe from the timeseries data (TESTING STOPS HERE DUE TO CERTIFICATE ISSUE)
+    response = api.get(endpoint=endpoint, params=params, api_version=1)
     return Data(response, selector="time-series-catalog")
+'''
