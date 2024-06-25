@@ -9,7 +9,7 @@ from cwms.types import JSON, Data
 
 
 def get_timeseries_catalog(page: Optional[str] = None,
-                           page_size: Optional[int] = None,
+                           page_size: Optional[int] = 5000,
                            unit_system: Optional[str] = None,
                            office: Optional[str] = None,
                            like: Optional[str] = None,

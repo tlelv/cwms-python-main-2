@@ -9,7 +9,7 @@ import cwms.catalog.catalog as ct
 
 
 def get_locations_catalog(page: Optional[str] = None,
-                          page_size: Optional[int] = None,
+                          page_size: Optional[int] = 5000,
                           unit_system: Optional[str] = None,
                           office: Optional[str] = None,
                           like: Optional[str] = None,
